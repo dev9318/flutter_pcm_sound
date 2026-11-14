@@ -105,12 +105,8 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                 category = AVAudioSessionCategoryPlayback;
             }
             else if ([iosAudioCategory isEqualToString:@"playAndRecord"]) {
-                NSError *routeError = nil;
-                [session setCategory:AVAudioSessionCategoryPlayAndRecord
-                         withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth
-                               error:&routeError];
-                [session setActive:YES error:&routeError];
-                [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&routeError];
+                category = AVAudioSessionCategoryPlayAndRecord;
+                options = AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth;
             }
             
             // Set the AVAudioSession category based on the string value
@@ -242,6 +238,20 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
 
             // start
             OSStatus status = AudioOutputUnitStart(_mAudioUnit);
+            #if TARGET_OS_IOS
+                AVAudioSession *session = [AVAudioSession sharedInstance];
+                if ([session.category isEqualToString:AVAudioSessionCategoryPlayAndRecord]) {
+                    // Re-apply DefaultToSpeaker + OverrideSpeaker right as playback starts
+                    // (Equivalent to audioManager.setSpeakerphoneOn(true) on Android)
+                    NSError *routeError = nil;
+                    [session setCategory:AVAudioSessionCategoryPlayAndRecord
+                             withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth
+                                   error:&routeError];
+                    [session setActive:YES error:&routeError];
+                    [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&routeError];
+                }
+            #endif
+            
             if (status != noErr) {
                 NSString* message = [NSString stringWithFormat:@"AudioOutputUnitStart failed. OSStatus: %@", @(status)];
                 result([FlutterError errorWithCode:@"AudioUnitError" message:message details:nil]);
