@@ -106,6 +106,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             }
             else if ([iosAudioCategory isEqualToString:@"playAndRecord"]) {
                 category = AVAudioSessionCategoryPlayAndRecord;
+                options = AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth;
             }
             
             // Set the AVAudioSession category based on the string value
