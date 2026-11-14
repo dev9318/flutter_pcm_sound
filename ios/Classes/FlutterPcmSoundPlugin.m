@@ -96,18 +96,21 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             self.mNumChannels = [numChannels intValue];
 
 #if TARGET_OS_IOS
-            // iOS audio category
+           // iOS audio category
             AVAudioSessionCategory category = AVAudioSessionCategorySoloAmbient;
+            AVAudioSessionCategoryOptions options = 0;
+            AVAudioSessionMode mode = AVAudioSessionModeDefault;
+
             if ([iosAudioCategory isEqualToString:@"ambient"]) {
                 category = AVAudioSessionCategoryAmbient;
             } else if ([iosAudioCategory isEqualToString:@"soloAmbient"]) {
                 category = AVAudioSessionCategorySoloAmbient;
             } else if ([iosAudioCategory isEqualToString:@"playback"]) {
                 category = AVAudioSessionCategoryPlayback;
-            }
-            else if ([iosAudioCategory isEqualToString:@"playAndRecord"]) {
+            } else if ([iosAudioCategory isEqualToString:@"playAndRecord"]) {
                 category = AVAudioSessionCategoryPlayAndRecord;
-                options = AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth;
+                options = AVAudioSessionCategoryOptionDefaultToSpeaker |
+                          AVAudioSessionCategoryOptionAllowBluetooth;
                 mode = AVAudioSessionModeVoiceChat;
             }
             
