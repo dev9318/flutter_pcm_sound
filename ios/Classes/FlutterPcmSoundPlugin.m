@@ -241,14 +241,10 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             #if TARGET_OS_IOS
                 AVAudioSession *session = [AVAudioSession sharedInstance];
                 if ([session.category isEqualToString:AVAudioSessionCategoryPlayAndRecord]) {
-                    // Re-apply DefaultToSpeaker + OverrideSpeaker right as playback starts
-                    // (Equivalent to audioManager.setSpeakerphoneOn(true) on Android)
-                    NSError *routeError = nil;
-                    [session setCategory:AVAudioSessionCategoryPlayAndRecord
-                             withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth
-                                   error:&routeError];
-                    [session setActive:YES error:&routeError];
-                    [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&routeError];
+                    AVAudioSessionPortDescription *currentOutput = session.currentRoute.outputs.firstObject;
+                    if (![currentOutput.portType isEqualToString:AVAudioSessionPortBuiltInSpeaker]) {
+                        [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+                    }
                 }
             #endif
             
