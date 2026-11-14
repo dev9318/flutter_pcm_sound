@@ -107,11 +107,12 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             else if ([iosAudioCategory isEqualToString:@"playAndRecord"]) {
                 category = AVAudioSessionCategoryPlayAndRecord;
                 options = AVAudioSessionCategoryOptionDefaultToSpeaker | AVAudioSessionCategoryOptionAllowBluetooth;
+                mode = AVAudioSessionModeVoiceChat
             }
             
             // Set the AVAudioSession category based on the string value
             NSError *error = nil;
-            [[AVAudioSession sharedInstance] setCategory:category error:&error];
+            [[AVAudioSession sharedInstance] setCategory:category mode:mode options:options error:&error];
             if (error) {
                 NSLog(@"Error setting AVAudioSession category: %@", error);
                 result([FlutterError errorWithCode:@"AVAudioSessionError" 
