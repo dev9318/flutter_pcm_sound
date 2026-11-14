@@ -116,7 +116,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             
             // Set the AVAudioSession category based on the string value
             NSError *error = nil;
-            [[AVAudioSession sharedInstance] setCategory:category options:options mode:mode error:&error];
+            [[AVAudioSession sharedInstance] setCategory:category mode:mode options:options error:&error];
             NSLog(@"[PCM] setup: requested=%@ cat=%@ mode=%@ opts=%lu",
                   iosAudioCategory, category, mode, (unsigned long)options);
             if (error) {
