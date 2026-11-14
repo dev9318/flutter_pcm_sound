@@ -33,6 +33,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
 
 @implementation FlutterPcmSoundPlugin
 
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar
 {
     FlutterMethodChannel *methodChannel = [FlutterMethodChannel methodChannelWithName:NAMESPACE @"/methods"
@@ -112,7 +113,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
             
             // Set the AVAudioSession category based on the string value
             NSError *error = nil;
-            [[AVAudioSession sharedInstance] setCategory:category options:options error:&error];
+            [[AVAudioSession sharedInstance] setCategory:category options:options mode:mode error:&error];
             if (error) {
                 NSLog(@"Error setting AVAudioSession category: %@", error);
                 result([FlutterError errorWithCode:@"AVAudioSessionError" 
@@ -243,7 +244,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
                 AVAudioSession *session = [AVAudioSession sharedInstance];
                 if ([session.category isEqualToString:AVAudioSessionCategoryPlayAndRecord]) {
                     AVAudioSessionPortDescription *currentOutput = session.currentRoute.outputs.firstObject;
-                    if (![currentOutput.portType isEqualToString:AVAudioSessionPortBuiltInSpeaker]) {
+                    if ([currentOutput.portType isEqualToString:AVAudioSessionPortBuiltInReceiver]) {
                         [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
                     }
                 }
