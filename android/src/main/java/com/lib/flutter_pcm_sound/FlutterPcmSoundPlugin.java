@@ -8,6 +8,7 @@ import android.media.AudioAttributes;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 
@@ -43,6 +44,7 @@ public class FlutterPcmSoundPlugin implements
     private volatile boolean mShouldCleanup = false;
 
     private AudioTrack mAudioTrack;
+    private Context mContext;
     private int mNumChannels;
     private int mMinBufferSize;
     private boolean mDidSetup = false;
@@ -70,6 +72,7 @@ public class FlutterPcmSoundPlugin implements
         BinaryMessenger messenger = binding.getBinaryMessenger();
         mMethodChannel = new MethodChannel(messenger, CHANNEL_NAME);
         mMethodChannel.setMethodCallHandler(this);
+        mContext = binding.getApplicationContext();
     }
 
     @Override
@@ -144,6 +147,14 @@ public class FlutterPcmSoundPlugin implements
                         mAudioTrack.release();
                         mAudioTrack = null;
                         return;
+                    }
+
+                    if (audioUsage == AudioAttributes.USAGE_VOICE_COMMUNICATION && mContext != null) {
+                        AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+                        if (audioManager != null) {
+                            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                            audioManager.setSpeakerphoneOn(true);
+                        }
                     }
 
                     // reset
@@ -230,6 +241,14 @@ public class FlutterPcmSoundPlugin implements
             }
             playbackThread = null;
             mDidSetup = false;
+        }
+
+        if (mContext != null) {
+            AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                audioManager.setSpeakerphoneOn(false);
+                audioManager.setMode(AudioManager.MODE_NORMAL);
+            }
         }
     }
 
